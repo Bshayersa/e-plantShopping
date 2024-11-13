@@ -1,38 +1,30 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 export const CartSlice = createSlice({
-  name: "cart",
+  name: 'cart',
   initialState: {
-    items: [], // مصفوفة لتخزين العناصر في السلة
+    items: [], // Initialize items as an empty array
   },
   reducers: {
-    // دالة لإضافة عنصر جديد
     addItem: (state, action) => {
-      const { name, image, cost } = action.payload;
-      const existingItem = state.items.find((item) => item.name === name);
+      const { name, image, cost } = action.payload; // Rename cost to price
+      
+      const existingItem = state.items.find(item => item.name === name);
       if (existingItem) {
         existingItem.quantity++;
       } else {
-        state.items.push({ name, image, cost, quantity: 1 });
+        console.log(cost)
+        state.items.push({ name, image, cost, quantity: 1 }); // Ensure you're adding price
       }
     },
-
-    // دالة لإزالة عنصر
     removeItem: (state, action) => {
-      state.items = state.items.filter(
-        (item) => item.name !== action.payload.name
-      );
+      state.items = state.items.filter(item => item.name !== action.payload);
     },
-
-    // دالة لتحديث كمية عنصر معين
     updateQuantity: (state, action) => {
       const { name, quantity } = action.payload;
-      const itemToUpdate = state.items.find((item) => item.name === name);
+      const itemToUpdate = state.items.find(item => item.name === name);
       if (itemToUpdate) {
         itemToUpdate.quantity = quantity;
-        if (quantity === 0) {
-          state.items = state.items.filter((item) => item.name !== name);
-        }
       }
     },
   },
@@ -40,6 +32,7 @@ export const CartSlice = createSlice({
 
 export const { addItem, removeItem, updateQuantity } = CartSlice.actions;
 
+export default CartSlice.reducer;
 export default CartSlice.reducer;
 
 
