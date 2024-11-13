@@ -4,7 +4,7 @@ import { removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
-  const cart = useSelector(state => state.cart.items);
+  const cart = useSelector(state => state.cart.items); // استرجاع العناصر من السلة
   const dispatch = useDispatch();
 
   // حساب إجمالي السلة
@@ -12,37 +12,51 @@ const CartItem = ({ onContinueShopping }) => {
     return cart
       .reduce((total, item) => {
         const cost = parseFloat(item.cost.replace('$', ''));
-        return total + cost * item.quantity;
+        return total + (cost * item.quantity);
       }, 0)
-      .toFixed(2);
+      .toFixed(2); // الإجمالي النهائي للسلة
   };
 
+  // متابعة التسوق
   const handleContinueShopping = (e) => {
     e.preventDefault();
-    onContinueShopping(); // تنفيذ دالة استكمال التسوق
+    onContinueShopping(); // استدعاء الدالة المرسلة من المكون الأب
   };
 
+  // زيادة الكمية
   const handleIncrement = (item) => {
     const newQuantity = item.quantity + 1;
     dispatch(updateQuantity({ name: item.name, quantity: newQuantity }));
   };
 
+  // تقليص الكمية
   const handleDecrement = (item) => {
     if (item.quantity > 1) {
       const newQuantity = item.quantity - 1;
       dispatch(updateQuantity({ name: item.name, quantity: newQuantity }));
+    } else {
+      dispatch(removeItem({ name: item.name })); // إزالة العنصر إذا كانت الكمية صفرًا
     }
   };
 
+  // إزالة العنصر من السلة
   const handleRemove = (item) => {
-    dispatch(removeItem({ name: item.name })); // حذف العنصر من السلة
+    dispatch(removeItem({ name: item.name }));
   };
 
-  // حساب التكلفة الإجمالية للعنصر
+  // حساب التكلفة الإجمالية لكل عنصر
   const calculateTotalCost = (item) => {
     const cost = parseFloat(item.cost.replace('$', ''));
-    return (cost * item.quantity).toFixed(2);
+    return (cost * item.quantity).toFixed(2); // التكلفة الإجمالية لكل عنصر بناءً على الكمية
   };
+
+  // الخروج (تنبيه للمستقبل)
+  const handleCheckoutShopping = (e) => {
+    alert('Functionality to be added for future reference');
+  };
+
+  // حساب إجمالي الكمية في السلة
+  const totalItemsInCart = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <div className="cart-container">
@@ -69,10 +83,15 @@ const CartItem = ({ onContinueShopping }) => {
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={handleCheckoutShopping}>Checkout</button>
+      </div>
+      <div className="total-items-in-cart">
+        <p>Total Items in Cart: {totalItemsInCart}</p> {/* عرض إجمالي الكمية في السلة */}
       </div>
     </div>
   );
 };
 
 export default CartItem;
+
+
