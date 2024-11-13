@@ -4,59 +4,45 @@ import { removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
-  const cart = useSelector(state => state.cart.items); // استرجاع العناصر من السلة
+  const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
-  // حساب إجمالي السلة
+  // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
-    return cart
-      .reduce((total, item) => {
-        const cost = parseFloat(item.cost.replace('$', ''));
-        return total + (cost * item.quantity);
-      }, 0)
-      .toFixed(2); // الإجمالي النهائي للسلة
+    return cart.reduce((total, item) => {
+      console.log(item.cost)
+      const price = typeof item.cost === "string" ? parseFloat(item.cost.replace("$", "")) : item.cost;
+      console.log(price)
+      return total + price * item.quantity;
+    }, 0);
   };
 
-  // متابعة التسوق
   const handleContinueShopping = (e) => {
-    e.preventDefault();
-    onContinueShopping(); // استدعاء الدالة المرسلة من المكون الأب
-  };
-
-  // زيادة الكمية
-  const handleIncrement = (item) => {
-    const newQuantity = item.quantity + 1;
-    dispatch(updateQuantity({ name: item.name, quantity: newQuantity }));
-  };
-
-  // تقليص الكمية
-  const handleDecrement = (item) => {
-    if (item.quantity > 1) {
-      const newQuantity = item.quantity - 1;
-      dispatch(updateQuantity({ name: item.name, quantity: newQuantity }));
-    } else {
-      dispatch(removeItem({ name: item.name })); // إزالة العنصر إذا كانت الكمية صفرًا
+    if (onContinueShopping) {
+      onContinueShopping(e);
     }
   };
 
-  // إزالة العنصر من السلة
+  const handleIncrement = (item) => {
+    dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1 }));
+  };
+
+  const handleDecrement = (item) => {
+    if (item.quantity > 1) {
+      dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
+    } else {
+      dispatch(removeItem(item.name));
+    }
+  };
+
   const handleRemove = (item) => {
-    dispatch(removeItem({ name: item.name }));
+    dispatch(removeItem(item.name));
   };
 
-  // حساب التكلفة الإجمالية لكل عنصر
   const calculateTotalCost = (item) => {
-    const cost = parseFloat(item.cost.replace('$', ''));
-    return (cost * item.quantity).toFixed(2); // التكلفة الإجمالية لكل عنصر بناءً على الكمية
+    const price = typeof item.cost === "string" ? parseFloat(item.cost.replace("$", "")) : item.cost;
+    return price * item.quantity;
   };
-
-  // الخروج (تنبيه للمستقبل)
-  const handleCheckoutShopping = (e) => {
-    alert('Functionality to be added for future reference');
-  };
-
-  // حساب إجمالي الكمية في السلة
-  const totalItemsInCart = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <div className="cart-container">
@@ -67,7 +53,7 @@ const CartItem = ({ onContinueShopping }) => {
             <img className="cart-item-image" src={item.image} alt={item.name} />
             <div className="cart-item-details">
               <div className="cart-item-name">{item.name}</div>
-              <div className="cart-item-cost">{item.cost}</div>
+              <div className="cart-item-cost">{item.cost}</div> {/* Ensure price is correctly accessed */}
               <div className="cart-item-quantity">
                 <button className="cart-item-button cart-item-button-dec" onClick={() => handleDecrement(item)}>-</button>
                 <span className="cart-item-quantity-value">{item.quantity}</span>
@@ -79,19 +65,16 @@ const CartItem = ({ onContinueShopping }) => {
           </div>
         ))}
       </div>
-      <div style={{ marginTop: '20px', color: 'black' }} className='total_cart_amount'></div>
-      <div className="continue_shopping_btn">
-        <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
-        <br />
-        <button className="get-started-button1" onClick={handleCheckoutShopping}>Checkout</button>
+      <div style={{ marginTop: '20px', color: 'black' }} className='total_cart_amount'>
+        Total Quantity: {cart.reduce((sum, item) => sum + item.quantity, 0)}
       </div>
-      <div className="total-items-in-cart">
-        <p>Total Items in Cart: {totalItemsInCart}</p> {/* عرض إجمالي الكمية في السلة */}
+      <div className="continue_shopping_btn">
+        <button className="get-started-button" onClick={handleContinueShopping}>Continue Shopping</button>
+        <br />
+        <button className="get-started-button1" onClick={() => alert('Checkout functionality to be implemented')}>Checkout</button>
       </div>
     </div>
   );
 };
 
 export default CartItem;
-
-
