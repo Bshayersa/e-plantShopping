@@ -282,7 +282,7 @@ const handlePlantsClick = (e) => {
         <div className="product-grid">
         {plantsArray.map((category, index) => (
             <div key={index}>
-                <h2>{category.category}</h2>
+                 <h2 style={{ textAlign: 'center' }}>{category.category}</h2>
                 <div className="product-list">
                     {category.plants.map((plant, i) => (
                         <div key={i} className="product-card">
